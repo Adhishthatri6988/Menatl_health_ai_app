@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Ripple } from "@/components/magicui/ripple";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { Slider } from "@/components/ui/slider"
 import {
   Brain,
   Heart,
@@ -122,7 +123,29 @@ export default function Home() {
                 ))}
               </div>
             </div>
+            {/* Enhanced slider with dynamic gradient */}
+            <div className="relative px-2">
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${currentEmotion.color} to-transparent blur-2xl -z-10 transition-all duration-500`}
+              />
+              <Slider
+                value={[emotion]}
+                onValueChange={(value) => setEmotion(value[0])}
+                min={0}
+                max={100}
+                step={1}
+                className="py-4"
+              />
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground animate-pulse">
+                Slide to express how you're feeling today
+              </p>
+            </div>
+          
           </motion.div>
+          
         </motion.div>
         </section>
     </div>
