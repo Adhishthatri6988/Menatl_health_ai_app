@@ -30,12 +30,44 @@ export default function Home() {
     { value: 75, label: "🤗 Happy", color: "from-yellow-500/50" },
     { value: 100, label: "✨ Excited", color: "from-pink-500/50" },
   ];
-
   
   const [emotion, setEmotion] = useState(50);
   const [mounted, setMounted] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+
+  const features = [
+    {
+      icon: HeartPulse,
+      title: "24/7 Support",
+      description: "Always here to listen and support you, any time of day",
+      color: "from-rose-500/20",
+      delay: 0.2,
+    },
+    {
+      icon: Lightbulb,
+      title: "Smart Insights",
+      description: "Personalized guidance powered by emotional intelligence",
+      color: "from-amber-500/20",
+      delay: 0.4,
+    },
+    {
+      icon: Lock,
+      title: "Private & Secure",
+      description: "Your conversations are always confidential and encrypted",
+      color: "from-emerald-500/20",
+      delay: 0.6,
+    },
+    {
+      icon: MessageSquareHeart,
+      title: "Evidence-Based",
+      description: "Therapeutic techniques backed by clinical research",
+      color: "from-blue-500/20",
+      delay: 0.8,
+    },
+  ];
+
+  
 
   useEffect(() => {
     setMounted(true);
@@ -164,10 +196,25 @@ export default function Home() {
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-size-200 bg-pos-0 group-hover:bg-pos-100" />
             </Button>
           </motion.div>
-          
         </motion.div>
-       
         </section>
+
+        {/* Enhanced Features Grid */}
+      <section className="relative py-20 px-4 overflow-hidden">
+        {/* <div className="absolute inset-0 bg-gradient-to-b from-background via-background/50 to-background" /> */}
+
+        <div className="max-w-6xl mx-auto">
+          <motion.div className="text-center mb-16 space-y-4 text-white ">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary/90 to-primary bg-clip-text text-transparent dark:text-primary/90">
+              How Aura Helps You
+            </h2>
+            <p className="text-foreground dark:text-foreground/95 max-w-2xl mx-auto font-medium text-lg">
+              Experience a new kind of emotional support, powered by empathetic
+              AI
+            </p>
+          </motion.div>
+          </div>
+          </section>
     </div>
   );
 }
