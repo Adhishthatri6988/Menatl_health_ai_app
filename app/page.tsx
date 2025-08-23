@@ -100,6 +100,27 @@ export default function Home() {
               <p className="text-sm text-muted-foreground/80 font-medium">
                 Whatever you're feeling, we're here to listen
               </p>
+            
+            <div className="flex justify-between items-center px-2">
+                {emotions.map((em) => (
+                  <div
+                    key={em.value}
+                    className={`transition-all duration-500 ease-out cursor-pointer hover:scale-105 ${
+                      Math.abs(emotion - em.value) < 15
+                        ? "opacity-100 scale-110 transform-gpu"
+                        : "opacity-50 scale-100"
+                    }`}
+                    onClick={() => setEmotion(em.value)}
+                  >
+                    <div className="text-2xl transform-gpu">
+                      {em.label.split(" ")[0]}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1 font-medium">
+                      {em.label.split(" ")[1]}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         </motion.div>
