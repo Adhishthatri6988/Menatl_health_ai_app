@@ -70,7 +70,38 @@ export default function Home() {
               Your AI Agent Mental Health Companion
             </span>
           </div>
+
           
+          {/* Enhanced main heading with smoother gradient */}
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-plus-jakarta tracking-tight">
+            <span className="inline-block bg-gradient-to-r from-primary via-primary/90 to-secondary bg-clip-text text-transparent [text-shadow:_0_1px_0_rgb(0_0_0_/_20%)] hover:to-primary transition-all duration-300">
+              Embrace serenity
+            </span>
+            <br />
+            <span className="inline-block mt-2 bg-gradient-to-b from-foreground to-foreground/90 bg-clip-text text-transparent">
+              within you.
+            </span>
+          </h1>
+
+          {/* Enhanced description with better readability */}
+          <p className="max-w-[600px] mx-auto text-base md:text-lg text-muted-foreground leading-relaxed tracking-wide">
+            Experience a new way of emotional support. Our AI companion is here
+            to listen, understand, and guide you through life's journey.
+          </p>
+
+           {/* Emotion slider section with enhanced transitions */}
+          <motion.div
+            className="w-full max-w-[600px] mx-auto space-y-6 py-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : 20 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            <div className="space-y-2 text-center">
+              <p className="text-sm text-muted-foreground/80 font-medium">
+                Whatever you're feeling, we're here to listen
+              </p>
+            </div>
+          </motion.div>
         </motion.div>
         </section>
     </div>
