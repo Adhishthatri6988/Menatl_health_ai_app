@@ -70,20 +70,25 @@ export function BreathingGame() {
 
   if (isComplete) {
     return (
-      <div className="flex flex-col items-center justify-center h-[400px] space-y-6">
+      <div className="flex flex-col items-center justify-center h-[400px] space-y-6 bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 shadow-sm p-6">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center"
         >
-          <Check className="w-10 h-10 text-green-500" />
+          <Check className="w-10 h-10 text-green-600 dark:text-green-400" />
         </motion.div>
-        <h3 className="text-2xl font-semibold">Great job!</h3>
-        <p className="text-muted-foreground text-center max-w-sm">
-          You've completed {TOTAL_ROUNDS} rounds of breathing exercises. How do
-          you feel?
+        <h3 className="text-2xl font-semibold text-green-700 dark:text-green-400">
+          Great job!
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300 text-center max-w-sm">
+          You’ve completed <span className="font-medium">{TOTAL_ROUNDS}</span>{" "}
+          rounds of breathing exercises. How do you feel?
         </p>
-        <Button onClick={handleReset} className="mt-4">
+        <Button
+          onClick={handleReset}
+          className="mt-4 bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600"
+        >
           Start Again
         </Button>
       </div>
@@ -91,28 +96,37 @@ export function BreathingGame() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-[400px] space-y-8">
+    <div className="flex flex-col items-center justify-center h-[400px] space-y-8 bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 shadow-sm p-6">
       <AnimatePresence mode="wait">
         <motion.div
           key={phase}
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
+          exit={{ opacity: 0, scale: 0.9 }}
           className="text-center space-y-4"
         >
-          <div className="relative w-32 h-32 mx-auto">
+          {/* Breathing circle */}
+          <div className="relative w-36 h-36 mx-auto">
             <motion.div
               animate={{
                 scale: phase === "inhale" ? 1.5 : phase === "exhale" ? 1 : 1.2,
               }}
               transition={{ duration: 4, ease: "easeInOut" }}
-              className="absolute inset-0 bg-primary/10 rounded-full"
+              className={`absolute inset-0 rounded-full ${
+                phase === "inhale"
+                  ? "bg-blue-500/20"
+                  : phase === "hold"
+                  ? "bg-yellow-500/20"
+                  : "bg-purple-500/20"
+              }`}
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <Wind className="w-8 h-8 text-primary" />
+              <Wind className="w-8 h-8 text-primary dark:text-blue-400" />
             </div>
           </div>
-          <h3 className="text-2xl font-semibold">
+
+          {/* Phase text */}
+          <h3 className="text-2xl font-semibold tracking-wide text-gray-900 dark:text-gray-100">
             {phase === "inhale"
               ? "Breathe In"
               : phase === "hold"
@@ -122,18 +136,21 @@ export function BreathingGame() {
         </motion.div>
       </AnimatePresence>
 
+      {/* Progress bar */}
       <div className="w-64">
-        <Progress value={progress} className="h-2" />
+        <Progress value={progress} className="h-2 rounded-full bg-gray-200 dark:bg-neutral-700" />
       </div>
 
+      {/* Round + Controls */}
       <div className="space-y-2 text-center">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-gray-600 dark:text-gray-300">
           Round {round} of {TOTAL_ROUNDS}
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsPaused(!isPaused)}
+          className="text-primary dark:text-blue-400"
         >
           {isPaused ? "Resume" : "Pause"}
         </Button>
