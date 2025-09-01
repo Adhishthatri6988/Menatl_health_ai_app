@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Gamepad2, Flower2, Wind, TreePine, Waves, Music2 } from "lucide-react";
+import {
+  Sparkles,
+  Flower,
+  Trees,
+  Waves,
+  Building2,
+  Clock,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,54 +17,55 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+// --- FINAL IMPORTS for the working game components ---
 import { BreathingGame } from "./breathing-game";
-import { TempleBuilder } from "./temple-builder";
 import { ForestGame } from "./forest-game";
 import { OceanWaves } from "./ocean-waves";
+import { TempleBuilder } from "./temple-builder";
 
 const games = [
   {
-    id: "breathing",
-    title: "Breathing Patterns",
-    description: "Follow calming breathing exercises with visual guidance",
-    icon: Wind,
-    color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
+    id: "petal-pulse",
+    title: "Petal Pulse",
+    description: "Sync your breath with a gently blooming flower.",
+    icon: Flower,
+    color: "text-rose-400 dark:text-rose-400",
+    bgColor: "bg-rose-500/10",
     duration: "5 mins",
   },
   {
-    id: "garden",
-    title: "Zen Garden",
-    description: "Create and maintain your digital peaceful space",
-    icon: Flower2,
-    color: "text-rose-500",
-    bgColor: "bg-rose-500/10",
-    duration: "10 mins",
-  },
-  {
-    id: "forest",
-    title: "Mindful Forest",
-    description: "Take a peaceful walk through a virtual forest",
-    icon: TreePine,
-    color: "text-green-500",
+    id: "temple-builder",
+    title: "Temple Builder",
+    description: "Cultivate a personal sanctuary of peace and reflection.",
+    icon: Building2,
+    color: "text-green-400 dark:text-green-400",
     bgColor: "bg-green-500/10",
-    duration: "15 mins",
+    duration: "Creative",
   },
   {
-    id: "waves",
-    title: "Ocean Waves",
-    description: "Match your breath with gentle ocean waves",
+    id: "grove-anthem",
+    title: "Grove Anthem",
+    description: "Listen to the symphony of a tranquil, whispering forest.",
+    icon: Trees,
+    color: "text-emerald-400 dark:text-emerald-400",
+    bgColor: "bg-emerald-500/10",
+    duration: "3 mins",
+  },
+  {
+    id: "coastal-cadence",
+    title: "Coastal Cadence",
+    description: "Match your breath to the rhythmic sound of ocean waves.",
     icon: Waves,
-    color: "text-cyan-500",
+    color: "text-cyan-400 dark:text-cyan-400",
     bgColor: "bg-cyan-500/10",
-    duration: "8 mins",
+    duration: "5 mins",
   },
 ];
 
@@ -73,7 +81,6 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
     setSelectedGame(gameId);
     setShowGame(true);
 
-    // Log the activity
     if (onGamePlayed) {
       try {
         await onGamePlayed(
@@ -87,14 +94,15 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
   };
 
   const renderGame = () => {
+    // --- THIS NOW RENDERS THE FINAL, WORKING COMPONENTS ---
     switch (selectedGame) {
-      case "breathing":
+      case "petal-pulse":
         return <BreathingGame />;
-      case "garden":
+      case "temple-builder":
         return <TempleBuilder />;
-      case "forest":
+      case "grove-anthem":
         return <ForestGame />;
-      case "waves":
+      case "coastal-cadence":
         return <OceanWaves />;
       default:
         return null;
@@ -103,14 +111,14 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
 
   return (
     <>
-      <Card className="border-primary/10">
+      <Card className="border-primary/10 bg-transparent">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold flex items-center gap-2">
-            <Gamepad2 className="h-5 w-5 text-primary" />
-            Anxiety Relief Activities
+          <CardTitle className="text-xl font-semibold flex items-center gap-2 text-primary dark:text-purple-300">
+            <Sparkles className="h-5 w-5" />
+            Calming Activities
           </CardTitle>
-          <CardDescription>
-            Interactive exercises to help reduce stress and anxiety
+          <CardDescription className="text-muted-foreground dark:text-slate-400">
+            Interactive experiences designed to bring you to a state of peace.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -120,54 +128,44 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
                 key={game.id}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                className="h-full"
               >
                 <Card
-                  className={`border-primary/10 hover:bg-primary/5 transition-colors cursor-pointer ${
-                    selectedGame === game.id ? "ring-2 ring-primary" : ""
-                  }`}
+                  className="border-primary/10 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 cursor-pointer h-full group"
                   onClick={() => handleGameStart(game.id)}
                 >
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 flex flex-col justify-between h-full">
                     <div className="flex items-start gap-4">
                       <div
-                        className={`p-3 rounded-xl ${game.bgColor} ${game.color}`}
+                        className={`p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 ${game.bgColor}`}
                       >
-                        <game.icon className="h-6 w-6" />
+                        <game.icon className={`h-6 w-6 ${game.color}`} />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold">{game.title}</h4>
+                        <h4 className="font-semibold text-foreground">{game.title}</h4>
                         <p className="text-sm text-muted-foreground mt-1">
                           {game.description}
                         </p>
-                        <div className="flex items-center gap-2 mt-3">
-                          <Music2 className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
-                            {game.duration}
-                          </span>
-                        </div>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 pl-1">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {game.duration}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
-
-          {selectedGame && (
-            <div className="mt-6 text-center">
-              <Button className="gap-2" onClick={() => setSelectedGame(null)}>
-                <Gamepad2 className="h-4 w-4" />
-                Start {games.find((g) => g.id === selectedGame)?.title}
-              </Button>
-            </div>
-          )}
         </CardContent>
       </Card>
 
       <Dialog open={showGame} onOpenChange={setShowGame}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] bg-background">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-primary">
               {games.find((g) => g.id === selectedGame)?.title}
             </DialogTitle>
           </DialogHeader>
@@ -177,3 +175,4 @@ export const AnxietyGames = ({ onGamePlayed }: AnxietyGamesProps) => {
     </>
   );
 };
+
