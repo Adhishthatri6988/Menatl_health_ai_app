@@ -4,20 +4,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { useSession } from "@/lib/contexts/session-context";
-import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
+// --- CHANGE: The props are now correct.
+// onSuccess expects to receive the mood data.
+// isSaving is passed down from the parent to control the loading state.
 interface MoodFormProps {
-  onSuccess?: () => void;
+  onSuccess: (data: { moodScore: number }) => void;
+  isSaving?: boolean;
 }
 
-export function MoodForm({ onSuccess }: MoodFormProps) {
+export function MoodForm({ onSuccess, isSaving }: MoodFormProps) {
   const [moodScore, setMoodScore] = useState(50);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-  const { user, isAuthenticated, loading } = useSession();
-  const router = useRouter();
 
   const emotions = [
     { value: 0, label: "😔", description: "Very Low" },
@@ -30,120 +29,67 @@ export function MoodForm({ onSuccess }: MoodFormProps) {
   const currentEmotion =
     emotions.find((em) => Math.abs(moodScore - em.value) < 15) || emotions[2];
 
-  const handleSubmit = async () => {
-    console.log("MoodForm: Starting submission");
-    console.log("MoodForm: Auth state:", { isAuthenticated, loading, user });
-
-    if (!isAuthenticated) {
-      console.log("MoodForm: User not authenticated");
-      toast({
-        title: "Authentication required",
-        description: "Please log in to track your mood",
-        variant: "destructive",
-      });
-      router.push("/login");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const token = localStorage.getItem("token");
-      console.log(
-        "MoodForm: Token from localStorage:",
-        token ? "exists" : "not found"
-      );
-
-      const response = await fetch("/api/mood", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ score: moodScore }),
-      });
-
-      console.log("MoodForm: Response status:", response.status);
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("MoodForm: Error response:", error);
-        throw new Error(error.error || "Failed to track mood");
-      }
-
-      const data = await response.json();
-      console.log("MoodForm: Success response:", data);
-
-      toast({
-        title: "Mood tracked successfully!",
-        description: "Your mood has been recorded.",
-      });
-
-      // Call onSuccess to close the modal
-      onSuccess?.();
-    } catch (error) {
-      console.error("MoodForm: Error:", error);
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to track mood",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  // --- CHANGE: The handleSubmit function is now much simpler.
+  // It no longer makes an API call. It just passes the data up to the parent.
+  const handleSubmit = () => {
+    if (isSaving) return;
+    onSuccess({ moodScore });
   };
 
   return (
-    <div className="space-y-6 py-4">
-      {/* Emotion display */}
-      <div className="text-center space-y-2">
-        <div className="text-4xl">{currentEmotion.label}</div>
-        <div className="text-sm text-muted-foreground">
+    // --- CHANGE: The entire component is now styled to match your purple theme. ---
+    <div className="space-y-8 py-4">
+      <motion.div
+        key={currentEmotion.label}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        className="text-center space-y-2"
+      >
+        <div className="text-6xl">{currentEmotion.label}</div>
+        <div className="text-md font-medium text-foreground">
           {currentEmotion.description}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Emotion slider */}
-      <div className="space-y-4">
-        <div className="flex justify-between px-2">
-          {emotions.map((em) => (
-            <div
-              key={em.value}
-              className={`cursor-pointer transition-opacity ${
-                Math.abs(moodScore - em.value) < 15
-                  ? "opacity-100"
-                  : "opacity-50"
-              }`}
-              onClick={() => setMoodScore(em.value)}
-            >
-              <div className="text-2xl">{em.label}</div>
-            </div>
-          ))}
-        </div>
-
+      <div className="space-y-4 px-2">
+        {/* --- CHANGE: Styled Slider to match the theme. --- */}
         <Slider
           value={[moodScore]}
           onValueChange={(value) => setMoodScore(value[0])}
           min={0}
           max={100}
           step={1}
-          className="py-4"
+          className="py-4 [&>span]:bg-primary/20 [&>span>span]:bg-gradient-to-r [&>span>span]:from-primary [&>span>span]:to-secondary"
         />
+        <div className="flex justify-between">
+          {emotions.map((em) => (
+            <div
+              key={em.value}
+              className="text-2xl opacity-50 cursor-pointer hover:opacity-100 transition-opacity"
+              onClick={() => setMoodScore(em.value)}
+            >
+              {em.label}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Submit button */}
+      {/* --- CHANGE: Styled Button with the primary gradient and loading state. --- */}
       <Button
-        className="w-full"
+        className={cn(
+            "w-full h-12 text-md font-semibold transition-all duration-300 ease-out group",
+            "bg-gradient-to-r from-primary to-secondary text-primary-foreground",
+            "hover:scale-105 hover:shadow-primary/40 dark:hover:shadow-[0_0_24px_theme(colors.primary/0.6)]"
+        )}
         onClick={handleSubmit}
-        disabled={isLoading || loading}
+        disabled={isSaving}
       >
-        {isLoading ? (
+        {isSaving ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Saving...
           </>
-        ) : loading ? (
-          "Loading..."
         ) : (
           "Save Mood"
         )}
