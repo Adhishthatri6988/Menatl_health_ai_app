@@ -187,5 +187,33 @@ export default function TherapyPage() {
 
     initChat();
   }, [sessionId]);
+
+  // Load all chat sessions
+  useEffect(() => {
+    const loadSessions = async () => {
+      try {
+        const allSessions = await getAllChatSessions();
+        setSessions(allSessions);
+      } catch (error) {
+        console.error("Failed to load sessions:", error);
+      }
+    };
+
+    loadSessions();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  };
+
+  useEffect(() => {
+    if (!isTyping) {
+      scrollToBottom();
+    }
+  }, [messages, isTyping]);
 }
 
