@@ -429,7 +429,85 @@ export default function TherapyPage() {
       <div className="flex h-[calc(100vh-4rem)] mt-20 gap-6">
         {/* Sidebar with chat history */}
         <div className="w-80 flex flex-col border-r bg-muted/30">
+          <div className="p-4 border-b">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Chat Sessions</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleNewSession}
+                className="hover:bg-primary/10"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <PlusCircle className="w-5 h-5" />
+                )}
+              </Button>
+            </div>
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-2"
+              onClick={handleNewSession}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <MessageSquare className="w-4 h-4" />
+              )}
+              New Session
+            </Button>
+          </div>
 
+          <ScrollArea className="flex-1 p-4">
+            <div className="space-y-4">
+              {sessions.map((session) => (
+                <div
+                  key={session.sessionId}
+                  className={cn(
+                    "p-3 rounded-lg text-sm cursor-pointer hover:bg-primary/5 transition-colors",
+                    session.sessionId === sessionId
+                      ? "bg-primary/10 text-primary"
+                      : "bg-secondary/10"
+                  )}
+                  onClick={() => handleSessionSelect(session.sessionId)}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <MessageSquare className="w-4 h-4" />
+                    <span className="font-medium">
+                      {session.messages[0]?.content.slice(0, 30) || "New Chat"}
+                    </span>
+                  </div>
+                  <p className="line-clamp-2 text-muted-foreground">
+                    {session.messages[session.messages.length - 1]?.content ||
+                      "No messages yet"}
+                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-xs text-muted-foreground">
+                      {session.messages.length} messages
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {(() => {
+                        try {
+                          const date = new Date(session.updatedAt);
+                          if (isNaN(date.getTime())) {
+                            return "Just now";
+                          }
+                          return formatDistanceToNow(date, {
+                            addSuffix: true,
+                          });
+                        } catch (error) {
+                          return "Just now";
+                        }
+                      })()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
         </div>
 
         {/* Main chat area */}
