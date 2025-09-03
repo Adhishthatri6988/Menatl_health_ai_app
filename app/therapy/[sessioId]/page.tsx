@@ -90,6 +90,22 @@ const glowAnimation = {
 const COMPLETION_THRESHOLD = 5;
 
 export default function TherapyPage() {
-
+  const params = useParams();
+  const router = useRouter();
+  const [message, setMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [stressPrompt, setStressPrompt] = useState<StressPrompt | null>(null);
+  const [showActivity, setShowActivity] = useState(false);
+  const [isChatPaused, setIsChatPaused] = useState(false);
+  const [showNFTCelebration, setShowNFTCelebration] = useState(false);
+  const [isCompletingSession, setIsCompletingSession] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(
+    params.sessionId as string
+  );
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
 }
 
