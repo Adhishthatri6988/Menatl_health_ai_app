@@ -137,5 +137,55 @@ export default function TherapyPage() {
       setIsLoading(false);
     }
   };
+
+  // Initialize chat session and load history
+  useEffect(() => {
+    const initChat = async () => {
+      try {
+        setIsLoading(true);
+        if (!sessionId || sessionId === "new") {
+          console.log("Creating new chat session...");
+          const newSessionId = await createChatSession();
+          console.log("New session created:", newSessionId);
+          setSessionId(newSessionId);
+          window.history.pushState({}, "", `/therapy/${newSessionId}`);
+        } else {
+          console.log("Loading existing chat session:", sessionId);
+          try {
+            const history = await getChatHistory(sessionId);
+            console.log("Loaded chat history:", history);
+            if (Array.isArray(history)) {
+              const formattedHistory = history.map((msg) => ({
+                ...msg,
+                timestamp: new Date(msg.timestamp),
+              }));
+              console.log("Formatted history:", formattedHistory);
+              setMessages(formattedHistory);
+            } else {
+              console.error("History is not an array:", history);
+              setMessages([]);
+            }
+          } catch (historyError) {
+            console.error("Error loading chat history:", historyError);
+            setMessages([]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to initialize chat:", error);
+        setMessages([
+          {
+            role: "assistant",
+            content:
+              "I apologize, but I'm having trouble loading the chat session. Please try refreshing the page.",
+            timestamp: new Date(),
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initChat();
+  }, [sessionId]);
 }
 
