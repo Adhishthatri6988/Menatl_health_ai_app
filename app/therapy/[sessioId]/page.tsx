@@ -107,5 +107,35 @@ export default function TherapyPage() {
     params.sessionId as string
   );
   const [sessions, setSessions] = useState<ChatSession[]>([]);
+
+  const handleNewSession = async () => {
+    try {
+      setIsLoading(true);
+      const newSessionId = await createChatSession();
+      console.log("New session created:", newSessionId);
+
+      // Update sessions list immediately
+      const newSession: ChatSession = {
+        sessionId: newSessionId,
+        messages: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // Update all state in one go
+      setSessions((prev) => [newSession, ...prev]);
+      setSessionId(newSessionId);
+      setMessages([]);
+
+      // Update URL without refresh
+      window.history.pushState({}, "", `/therapy/${newSessionId}`);
+
+      // Force a re-render of the chat area
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to create new session:", error);
+      setIsLoading(false);
+    }
+  };
 }
 
