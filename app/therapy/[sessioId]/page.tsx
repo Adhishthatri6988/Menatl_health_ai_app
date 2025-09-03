@@ -28,7 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BreathingGame } from "@/components/games/breathing-game";
-import { TempleBuilder} from "@/components/games/temple-builder";
+import { TempleBuilder } from "@/components/games/temple-builder";
 import { ForestGame } from "@/components/games/forest-game";
 import { OceanWaves } from "@/components/games/ocean-waves";
 import { Badge } from "@/components/ui/badge";
@@ -735,4 +735,3 @@ export default function TherapyPage() {
     </div>
   );
 }
-
