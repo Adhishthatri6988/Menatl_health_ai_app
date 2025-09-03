@@ -423,5 +423,21 @@ export default function TherapyPage() {
       setIsLoading(false);
     }
   };
+
+  return (
+    <div className="relative max-w-7xl mx-auto px-4">
+      <div className="flex h-[calc(100vh-4rem)] mt-20 gap-6">
+        {/* Sidebar with chat history */}
+        <div className="w-80 flex flex-col border-r bg-muted/30">
+
+        </div>
+
+        {/* Main chat area */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-background rounded-lg border">
+          
+        </div>
+      </div>
+    </div>
+  );
 }
 
