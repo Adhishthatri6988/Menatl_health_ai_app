@@ -215,5 +215,100 @@ export default function TherapyPage() {
       scrollToBottom();
     }
   }, [messages, isTyping]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted");
+    const currentMessage = message.trim();
+    console.log("Current message:", currentMessage);
+    console.log("Session ID:", sessionId);
+    console.log("Is typing:", isTyping);
+    console.log("Is chat paused:", isChatPaused);
+
+    if (!currentMessage || isTyping || isChatPaused || !sessionId) {
+      console.log("Submission blocked:", {
+        noMessage: !currentMessage,
+        isTyping,
+        isChatPaused,
+        noSessionId: !sessionId,
+      });
+      return;
+    }
+
+    setMessage("");
+    setIsTyping(true);
+
+    try {
+      // Add user message
+      const userMessage: ChatMessage = {
+        role: "user",
+        content: currentMessage,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, userMessage]);
+
+      // Check for stress signals
+      const stressCheck = detectStressSignals(currentMessage);
+      if (stressCheck) {
+        setStressPrompt(stressCheck);
+        setIsTyping(false);
+        return;
+      }
+
+      console.log("Sending message to API...");
+      // Send message to API
+      const response = await sendChatMessage(sessionId, currentMessage);
+      console.log("Raw API response:", response);
+
+      // Parse the response if it's a string
+      const aiResponse =
+        typeof response === "string" ? JSON.parse(response) : response;
+      console.log("Parsed AI response:", aiResponse);
+
+      // Add AI response with metadata
+      const assistantMessage: ChatMessage = {
+        role: "assistant",
+        content:
+          aiResponse.response ||
+          aiResponse.message ||
+          "I'm here to support you. Could you tell me more about what's on your mind?",
+        timestamp: new Date(),
+        metadata: {
+          analysis: aiResponse.analysis || {
+            emotionalState: "neutral",
+            riskLevel: 0,
+            themes: [],
+            recommendedApproach: "supportive",
+            progressIndicators: [],
+          },
+          technique: aiResponse.metadata?.technique || "supportive",
+          goal: aiResponse.metadata?.currentGoal || "Provide support",
+          progress: aiResponse.metadata?.progress || {
+            emotionalState: "neutral",
+            riskLevel: 0,
+          },
+        },
+      };
+
+      console.log("Created assistant message:", assistantMessage);
+
+      // Add the message immediately
+      setMessages((prev) => [...prev, assistantMessage]);
+      setIsTyping(false);
+      scrollToBottom();
+    } catch (error) {
+      console.error("Error in chat:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+          timestamp: new Date(),
+        },
+      ]);
+      setIsTyping(false);
+    }
+  };
 }
 
