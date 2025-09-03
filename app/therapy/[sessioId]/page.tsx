@@ -310,5 +310,118 @@ export default function TherapyPage() {
       setIsTyping(false);
     }
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  const detectStressSignals = (message: string): StressPrompt | null => {
+    const stressKeywords = [
+      "stress",
+      "anxiety",
+      "worried",
+      "panic",
+      "overwhelmed",
+      "nervous",
+      "tense",
+      "pressure",
+      "can't cope",
+      "exhausted",
+    ];
+
+    const lowercaseMsg = message.toLowerCase();
+    const foundKeyword = stressKeywords.find((keyword) =>
+      lowercaseMsg.includes(keyword)
+    );
+
+    if (foundKeyword) {
+      const activities = [
+        {
+          type: "breathing" as const,
+          title: "Breathing Exercise",
+          description:
+            "Follow calming breathing exercises with visual guidance",
+        },
+        {
+          type: "temple" as const,
+          title: "Temple Builder",
+          description: "Create and maintain your digital peaceful space",
+        },
+        {
+          type: "forest" as const,
+          title: "Mindful Forest",
+          description: "Take a peaceful walk through a virtual forest",
+        },
+        {
+          type: "waves" as const,
+          title: "Ocean Waves",
+          description: "Match your breath with gentle ocean waves",
+        },
+      ];
+
+      return {
+        trigger: foundKeyword,
+        activity: activities[Math.floor(Math.random() * activities.length)],
+      };
+    }
+
+    return null;
+  };
+
+  const handleSuggestedQuestion = async (text: string) => {
+    if (!sessionId) {
+      const newSessionId = await createChatSession();
+      setSessionId(newSessionId);
+      router.push(`/therapy/${newSessionId}`);
+    }
+
+    setMessage(text);
+    setTimeout(() => {
+      const event = new Event("submit") as unknown as React.FormEvent;
+      handleSubmit(event);
+    }, 0);
+  };
+
+  const handleCompleteSession = async () => {
+    if (isCompletingSession) return;
+    setIsCompletingSession(true);
+    try {
+      setShowNFTCelebration(true);
+    } catch (error) {
+      console.error("Error completing session:", error);
+    } finally {
+      setIsCompletingSession(false);
+    }
+  };
+
+  const handleSessionSelect = async (selectedSessionId: string) => {
+    if (selectedSessionId === sessionId) return;
+
+    try {
+      setIsLoading(true);
+      const history = await getChatHistory(selectedSessionId);
+      if (Array.isArray(history)) {
+        const formattedHistory = history.map((msg) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        }));
+        setMessages(formattedHistory);
+        setSessionId(selectedSessionId);
+        window.history.pushState({}, "", `/therapy/${selectedSessionId}`);
+      }
+    } catch (error) {
+      console.error("Failed to load session:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 }
 
