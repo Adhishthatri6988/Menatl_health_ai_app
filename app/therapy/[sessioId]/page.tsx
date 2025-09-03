@@ -27,7 +27,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { BreathingGame } from "@/components/games/breathing-game";
+import { TempleBuilder} from "@/components/games/temple-builder";
+import { ForestGame } from "@/components/games/forest-game";
+import { OceanWaves } from "@/components/games/ocean-waves";
 import { Badge } from "@/components/ui/badge";
+import {
+  createChatSession,
+  sendChatMessage,
+  getChatHistory,
+  ChatMessage,
+  getAllChatSessions,
+  ChatSession,
+} from "@/lib/api/chat";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { formatDistanceToNow } from "date-fns";
 import { Separator } from "@/components/ui/separator";
+
+interface SuggestedQuestion {
+  id: string;
+  text: string;
+}
+
+interface StressPrompt {
+  trigger: string;
+  activity: {
+    type: "breathing" | "temple" | "forest" | "waves";
+    title: string;
+    description: string;
+  };
+}
+
+interface ApiResponse {
+  message: string;
+  metadata: {
+    technique: string;
+    goal: string;
+    progress: any[];
+  };
+}
 
