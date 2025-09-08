@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
-  // ... (register function code remains unchanged)
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -89,6 +88,18 @@ export const login = async (req: Request, res: Response) => {
       token,
       message: "Login successful",
     });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (token) {
+      await Session.deleteOne({ token });
+    }
+    res.json({ message: "Logged out successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
