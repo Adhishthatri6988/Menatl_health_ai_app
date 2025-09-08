@@ -67,6 +67,18 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: "24h" }
     );
 
+    // Create session
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours from now
+
+    const session = new Session({
+      userId: user._id,
+      token,
+      expiresAt,
+      deviceInfo: req.headers["user-agent"],
+    });
+    await session.save();
+
     // Respond with user data and token
     res.json({
       user: {
