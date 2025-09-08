@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
+  // ... (register function code from commit 3 remains unchanged)
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -30,6 +31,43 @@ export const register = async (req: Request, res: Response) => {
         email: user.email,
       },
       message: "User registered successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required." });
+    }
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password." });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid email or password." });
+    }
+
+    // Respond with user data
+    res.json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      message: "Login successful",
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
