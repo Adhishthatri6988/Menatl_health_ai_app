@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
-  // ... (register function code from commit 3 remains unchanged)
+  // ... (register function code remains unchanged)
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -60,13 +60,21 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
-    // Respond with user data
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "24h" }
+    );
+
+    // Respond with user data and token
     res.json({
       user: {
         _id: user._id,
         name: user.name,
         email: user.email,
       },
+      token,
       message: "Login successful",
     });
   } catch (error) {
