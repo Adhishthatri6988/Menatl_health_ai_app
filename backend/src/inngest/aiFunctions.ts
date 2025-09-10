@@ -17,7 +17,26 @@ export const processChatMessage = inngest.createFunction(
         historyLength: history?.length,
       });
 
-      return { response: "", analysis: {}, updatedMemory: memory };
+      const analysis = await step.run("analyze-message", async () => {
+        try {
+          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+          const prompt = `Analyze this therapy message: ${message}`;
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          const text = response.text().trim();
+          return JSON.parse(text);
+        } catch {
+          return {
+            emotionalState: "neutral",
+            themes: [],
+            riskLevel: 0,
+            recommendedApproach: "supportive",
+            progressIndicators: [],
+          };
+        }
+      });
+
+      return { response: "", analysis, updatedMemory: memory };
     } catch (error) {
       logger.error("Error in chat message processing:", error);
       return { response: "Default fallback", analysis: {}, updatedMemory: {} };
