@@ -86,3 +86,27 @@ export const processChatMessage = inngest.createFunction(
     }
   }
 );
+
+export const analyzeTherapySession = inngest.createFunction(
+  { id: "analyze-therapy-session" },
+  { event: "therapy/session.created" },
+  async ({ event, step }) => {
+    try {
+      const sessionContent = await step.run("get-session-content", async () => {
+        return event.data.notes || event.data.transcript;
+      });
+
+      const analysis = await step.run("analyze-with-gemini", async () => {
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const prompt = `Analyze session: ${sessionContent}`;
+        const result = await model.generateContent(prompt);
+        return JSON.parse(result.response.text());
+      });
+
+      return { message: "Session analysis completed", analysis };
+    } catch (error) {
+      logger.error("Error in therapy session analysis:", error);
+      throw error;
+    }
+  }
+);
