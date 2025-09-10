@@ -57,7 +57,6 @@ export const processChatMessage = inngest.createFunction(
         return memory;
       });
 
-      // Risk alert
       if (analysis.riskLevel > 4) {
         await step.run("trigger-risk-alert", async () => {
           logger.warn("High risk level detected in chat message", {
@@ -67,7 +66,20 @@ export const processChatMessage = inngest.createFunction(
         });
       }
 
-      return { response: "", analysis, updatedMemory };
+      const response = await step.run("generate-response", async () => {
+        try {
+          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+          const prompt = `${systemPrompt}\nMessage: ${message}\nAnalysis: ${JSON.stringify(
+            analysis
+          )}`;
+          const result = await model.generateContent(prompt);
+          return result.response.text().trim();
+        } catch {
+          return "I'm here to support you. Could you tell me more about what's on your mind?";
+        }
+      });
+
+      return { response, analysis, updatedMemory };
     } catch (error) {
       logger.error("Error in chat message processing:", error);
       return { response: "Default fallback", analysis: {}, updatedMemory: {} };
