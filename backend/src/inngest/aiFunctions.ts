@@ -36,7 +36,28 @@ export const processChatMessage = inngest.createFunction(
         }
       });
 
-      return { response: "", analysis, updatedMemory: memory };
+      const updatedMemory = await step.run("update-memory", async () => {
+        if (analysis.emotionalState) {
+          memory.userProfile = memory.userProfile || {};
+          memory.userProfile.emotionalState = [
+            ...(memory.userProfile.emotionalState || []),
+            analysis.emotionalState,
+          ];
+        }
+        if (analysis.themes) {
+          memory.sessionContext = memory.sessionContext || {};
+          memory.sessionContext.conversationThemes = [
+            ...(memory.sessionContext.conversationThemes || []),
+            ...analysis.themes,
+          ];
+        }
+        if (analysis.riskLevel) {
+          memory.userProfile.riskLevel = analysis.riskLevel;
+        }
+        return memory;
+      });
+
+      return { response: "", analysis, updatedMemory };
     } catch (error) {
       logger.error("Error in chat message processing:", error);
       return { response: "Default fallback", analysis: {}, updatedMemory: {} };
