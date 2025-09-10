@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 import { logger } from "./logger";
 
-const MONGODB_URI =process.env.MONGODB_URI || "mongodb+srv://asunasingh2003_db_user:3e2ZnPJG4t4rb39i@ai-therapist-app.0mbf24u.mongodb.net/?retryWrites=true&w=majority&appName=ai-therapist-app" ;
+dotenv.config();
+
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 export const connectDB = async () => {
   try {
