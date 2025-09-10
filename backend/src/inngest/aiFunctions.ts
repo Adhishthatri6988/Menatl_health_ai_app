@@ -144,3 +144,9 @@ export const generateActivityRecommendations = inngest.createFunction(
   }
 );
 
+export const functions = [
+  processChatMessage,
+  analyzeTherapySession,
+  generateActivityRecommendations,
+];
+
