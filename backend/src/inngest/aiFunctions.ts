@@ -110,3 +110,37 @@ export const analyzeTherapySession = inngest.createFunction(
     }
   }
 );
+
+export const generateActivityRecommendations = inngest.createFunction(
+  { id: "generate-activity-recommendations" },
+  { event: "mood/updated" },
+  async ({ event, step }) => {
+    try {
+      const userContext = await step.run("get-user-context", async () => {
+        return {
+          recentMoods: event.data.recentMoods,
+          completedActivities: event.data.completedActivities,
+          preferences: event.data.preferences,
+        };
+      });
+
+      const recommendations = await step.run(
+        "generate-recommendations",
+        async () => {
+          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+          const prompt = `Generate activity recommendations: ${JSON.stringify(
+            userContext
+          )}`;
+          const result = await model.generateContent(prompt);
+          return JSON.parse(result.response.text());
+        }
+      );
+
+      return { message: "Activity recommendations generated", recommendations };
+    } catch (error) {
+      logger.error("Error generating activity recommendations:", error);
+      throw error;
+    }
+  }
+);
+
