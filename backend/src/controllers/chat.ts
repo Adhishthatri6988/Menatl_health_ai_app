@@ -19,23 +19,17 @@ const genAI = new GoogleGenerativeAI(apiKey);
 // Create a new chat session
 export const createChatSession = async (req: Request, res: Response) => {
   try {
-    // Check if user is authenticated
     if (!req.user || !req.user.id) {
       return res
         .status(401)
         .json({ message: "Unauthorized - User not authenticated" });
     }
-
     const userId = new Types.ObjectId(req.user.id);
     const user = await User.findById(userId);
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    // Generate a unique sessionId
     const sessionId = uuidv4();
-
     const session = new ChatSession({
       sessionId,
       userId,
@@ -43,9 +37,7 @@ export const createChatSession = async (req: Request, res: Response) => {
       status: "active",
       messages: [],
     });
-
     await session.save();
-
     res.status(201).json({
       message: "Chat session created successfully",
       sessionId: session.sessionId,
@@ -68,7 +60,6 @@ export const sendMessage = async (req: Request, res: Response) => {
 
     logger.info("Processing message:", { sessionId, message });
 
-    // Find session by sessionId
     const session = await ChatSession.findOne({ sessionId });
     if (!session) {
       logger.warn("Session not found:", { sessionId });
@@ -80,8 +71,38 @@ export const sendMessage = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
+    // Create Inngest event for message processing
+    const event: InngestEvent = {
+      name: "therapy/session.message",
+      data: {
+        message,
+        history: session.messages,
+        memory: {
+          userProfile: {
+            emotionalState: [],
+            riskLevel: 0,
+            preferences: {},
+          },
+          sessionContext: {
+            conversationThemes: [],
+            currentTechnique: null,
+          },
+        },
+        goals: [],
+        systemPrompt: `You are an AI therapist assistant. Your role is to:
+        1. Provide empathetic and supportive responses
+        2. Use evidence-based therapeutic techniques
+        3. Maintain professional boundaries
+        4. Monitor for risk factors
+        5. Guide users toward their therapeutic goals`,
+      },
+    };
+
+    logger.info("Sending message to Inngest:", { event });
+    await inngest.send(event);
+
     // AI processing logic will be added here...
-    res.json({ message: "Placeholder response" });
+    res.json({ message: "Placeholder response after Inngest send" });
 
   } catch (error) {
     logger.error("Error in sendMessage:", error);
